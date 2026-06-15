@@ -1,3 +1,11 @@
+export type PlantStatus = 'empty' | 'growing' | 'mature'
+
+export interface PlantSlot {
+  status: PlantStatus
+  plantedTurn: number
+  maturesIn: number
+}
+
 export interface GameState {
   health: number
   hunger: number
@@ -7,6 +15,7 @@ export interface GameState {
   turn: number
   isGameOver: boolean
   logs: LogEntry[]
+  plots: PlantSlot[]
 }
 
 export interface LogEntry {
@@ -29,7 +38,7 @@ export interface RandomEvent {
   }
 }
 
-export type ActionType = 'gatherWood' | 'gatherStone' | 'hunt' | 'drink'
+export type ActionType = 'gatherWood' | 'gatherStone' | 'hunt' | 'drink' | 'plant' | 'harvest'
 
 export interface ActionEffect {
   health?: number

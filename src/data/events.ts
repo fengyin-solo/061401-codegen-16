@@ -91,4 +91,34 @@ export const randomEvents: RandomEvent[] = [
     type: 'good',
     effects: { stone: 6, wood: 4 },
   },
+  {
+    id: 'pest_infestation',
+    text: '虫害侵袭了你的作物！有些植物枯萎了。',
+    type: 'bad',
+    effects: {},
+  },
+  {
+    id: 'bumper_harvest',
+    text: '今年的作物长势特别好，你获得了额外的收成！',
+    type: 'good',
+    effects: { hunger: -8 },
+  },
+  {
+    id: 'rain_nourish',
+    text: '一场及时雨滋润了你的作物，生长速度加快了。',
+    type: 'good',
+    effects: { thirst: -5 },
+  },
+  {
+    id: 'wild_boar_raids',
+    text: '野猪闯入了你的农田，糟蹋了一些庄稼！',
+    type: 'bad',
+    effects: { health: -3 },
+  },
+  {
+    id: 'seed_discovery',
+    text: '你在草丛中发现了优质的种子！',
+    type: 'good',
+    effects: { wood: 2 },
+  },
 ]

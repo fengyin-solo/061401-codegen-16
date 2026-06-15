@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import type { PlantSlot } from '@/types/game'
 
 interface StatItem {
   label: string
@@ -17,6 +18,8 @@ interface Props {
   thirst: number
   wood: number
   stone: number
+  plots: PlantSlot[]
+  currentTurn: number
 }
 
 const props = defineProps<Props>()
@@ -78,6 +81,33 @@ function isDanger(value: number, max: number, isReverse?: boolean): boolean {
   }
   return percent <= 20
 }
+
+function getPlotStatusText(plot: PlantSlot): string {
+  if (plot.status === 'empty') return '空闲'
+  if (plot.status === 'mature') return '已成熟'
+  const elapsed = props.currentTurn - plot.plantedTurn
+  const remaining = Math.max(0, plot.maturesIn - elapsed)
+  return `生长中 (${remaining}回合)`
+}
+
+function getPlotIcon(plot: PlantSlot): string {
+  if (plot.status === 'empty') return '🕳️'
+  if (plot.status === 'mature') return '🌾'
+  return '🌱'
+}
+
+function getPlotColor(plot: PlantSlot): string {
+  if (plot.status === 'empty') return 'text-gray-500'
+  if (plot.status === 'mature') return 'text-yellow-400'
+  return 'text-green-400'
+}
+
+function getGrowthPercent(plot: PlantSlot): number {
+  if (plot.status === 'empty') return 0
+  if (plot.status === 'mature') return 100
+  const elapsed = props.currentTurn - plot.plantedTurn
+  return Math.min(100, Math.round((elapsed / plot.maturesIn) * 100))
+}
 </script>
 
 <template>
@@ -112,6 +142,37 @@ function isDanger(value: number, max: number, isReverse?: boolean): boolean {
             :class="[stat.barColor, 'h-full rounded-full transition-all duration-300 ease-out']"
             :style="{ width: getBarWidth(stat.value, stat.max) }"
           ></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-5 pt-4 border-t border-game-border">
+      <h3 class="text-sm font-semibold text-white mb-3 flex items-center gap-2">
+        <span>🌾</span>
+        <span>种植区</span>
+      </h3>
+      <div class="space-y-2">
+        <div
+          v-for="(plot, index) in plots"
+          :key="index"
+          class="flex items-center gap-3 bg-gray-800/50 rounded-lg px-3 py-2"
+        >
+          <span class="text-lg">{{ getPlotIcon(plot) }}</span>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center justify-between mb-1">
+              <span :class="[getPlotColor(plot), 'text-xs font-medium']">地块 {{ index + 1 }}</span>
+              <span :class="[getPlotColor(plot), 'text-xs']">{{ getPlotStatusText(plot) }}</span>
+            </div>
+            <div v-if="plot.status !== 'empty'" class="h-1.5 bg-gray-700 rounded-full overflow-hidden">
+              <div
+                :class="[
+                  plot.status === 'mature' ? 'bg-yellow-400' : 'bg-green-500',
+                  'h-full rounded-full transition-all duration-300 ease-out',
+                ]"
+                :style="{ width: getGrowthPercent(plot) + '%' }"
+              ></div>
+            </div>
+          </div>
         </div>
       </div>
     </div>

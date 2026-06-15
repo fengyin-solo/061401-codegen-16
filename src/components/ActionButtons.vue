@@ -14,6 +14,8 @@ interface Props {
   canGatherStone: boolean
   canHunt: boolean
   canDrink: boolean
+  canPlant: boolean
+  canHarvest: boolean
   disabled: boolean
 }
 
@@ -24,6 +26,8 @@ const emit = defineEmits<{
   gatherStone: []
   hunt: []
   drink: []
+  plant: []
+  harvest: []
 }>()
 
 const buttons: ActionButton[] = [
@@ -63,7 +67,38 @@ const buttons: ActionButton[] = [
     bgClass: 'bg-blue-900/40',
     hoverClass: 'hover:bg-blue-800/60',
   },
+  {
+    label: '播种',
+    icon: '🌱',
+    description: '消耗2木材，3回合后成熟',
+    action: () => emit('plant'),
+    disabled: false,
+    bgClass: 'bg-green-900/40',
+    hoverClass: 'hover:bg-green-800/60',
+  },
+  {
+    label: '收成',
+    icon: '🌾',
+    description: '收割成熟作物，大幅降低饥饿',
+    action: () => emit('harvest'),
+    disabled: false,
+    bgClass: 'bg-yellow-900/40',
+    hoverClass: 'hover:bg-yellow-800/60',
+  },
 ]
+
+const disabledMap: Record<string, boolean> = {
+  '采集木头': !props.canGatherWood,
+  '采集石头': !props.canGatherStone,
+  '打猎': !props.canHunt,
+  '喝水': !props.canDrink,
+  '播种': !props.canPlant,
+  '收成': !props.canHarvest,
+}
+
+function isButtonDisabled(btn: ActionButton): boolean {
+  return disabled || disabledMap[btn.label]
+}
 </script>
 
 <template>
@@ -74,15 +109,15 @@ const buttons: ActionButton[] = [
     </h2>
     <div class="grid grid-cols-2 gap-3">
       <button
-        v-for="(btn, index) in buttons"
+        v-for="btn in buttons"
         :key="btn.label"
         @click="btn.action"
-        :disabled="disabled || (index === 0 ? !canGatherWood : index === 1 ? !canGatherStone : index === 2 ? !canHunt : !canDrink)"
+        :disabled="isButtonDisabled(btn)"
         :class="[
           btn.bgClass,
           'relative p-4 rounded-xl border border-game-border transition-all duration-200',
           'flex flex-col items-center justify-center gap-2 text-center',
-          disabled || (index === 0 ? !canGatherWood : index === 1 ? !canGatherStone : index === 2 ? !canHunt : !canDrink)
+          isButtonDisabled(btn)
             ? 'opacity-40 cursor-not-allowed'
             : [btn.hoverClass, 'hover:scale-[1.02] hover:shadow-lg cursor-pointer active:scale-[0.98]'],
         ]"
